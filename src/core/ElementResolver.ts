@@ -8,7 +8,7 @@ import {each, isArray, isFunction, isString, toArray} from './utils';
  */
 export function resolveElements(source: ja.ElementSource): Element[] {
     if (!source) {
-        throw Error('source is undefined');
+        throw Error('missing elements');
     }
     if (isString(source)) {
         // if query selector, search for elements 

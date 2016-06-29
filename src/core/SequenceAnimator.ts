@@ -219,11 +219,7 @@ export class SequenceAnimator implements ja.IAnimator {
     }
 
     private _playNextStep(evt: ja.IAnimator): void {
-        if (this.playbackRate === -1) {
-            this._currentIndex--;
-        } else {
-            this._currentIndex++;
-        }
+        this._currentIndex += this.playbackRate === -1 ? - 1 : 1;
         if (this._isInEffect()) {
             this._playThisStep();
         } else {
@@ -233,11 +229,9 @@ export class SequenceAnimator implements ja.IAnimator {
 
     private _playThisStep(): void {
         if (!this._isInEffect()) {
-            if (this.playbackRate === -1) {
-                this._currentIndex = this._steps.length - 1;
-            } else {
-                this._currentIndex = 0;
-            }
+            this._currentIndex = this.playbackRate === -1
+                ? this._steps.length - 1
+                : 0;
         }
         const animator = this._getAnimator();
 

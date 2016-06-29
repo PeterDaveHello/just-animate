@@ -1,39 +1,13 @@
-import { isDefined, isNumber, isString, isArray, map, extend, toArray, transfer, fill, _ } from './utils';
+import { isDefined, isNumber, isString, isArray, map, extend,
+    fill, toArray, transfer, replaceCamelCased, transformFunction, _ } from './utils';
 import { argumentError } from './errors';
 
-const hyphenToPascal = /([a-z])-([a-z])/ig;
-
-const x = 0;
-const y = 1;
-const z = 2;
-const offset = 'offset';
-const scale3d = 'scale3d';
-const scale = 'scale';
-const scaleX = 'scaleX';
-const scaleY = 'scaleY';
-const scaleZ = 'scaleZ';
-const skew = 'skew';
-const skewX = 'skewX';
-const skewY = 'skewY';
-const rotate3d = 'rotate3d';
-const rotate = 'rotate';
-const rotateX = 'rotateX';
-const rotateY = 'rotateY';
-const rotateZ = 'rotateZ';
-const translate3d = 'translate3d';
-const translate = 'translate';
-const translateX = 'translateX';
-const translateY = 'translateY';
-const translateZ = 'translateZ';
-const transform = 'transform';
-
-function replaceCamelCased(match: string, p1: string, p2: string): string {
-    return p1 + p2.toUpperCase();
-}
-
-function transformFunction(name: string, params: ja.IIndexed<string | number>): string {
-    return `${name}(${toArray(arguments, 1).join(',')})`;
-}
+import { hyphenToPascal, offset,
+    rotate, rotate3d, rotateX, rotateY, rotateZ,
+    scale, scale3d, scaleX, scaleY, scaleZ,
+    skew, skewX, skewY, transform,
+    translate, translate3d, translateX, translateY, translateZ, x, y, z
+} from './literals';
 
 
 
@@ -137,10 +111,10 @@ export function normalizeKeyframes(keyframes: ja.IKeyframe[]): ja.IKeyframe[] {
  */
 export function keyframeTransformer(keyframe: ja.IKeyframe): ja.IKeyframe {
     // transform properties
-    const scaleArray: number[] = [_,_,_];
-    const skewArray: (string|number)[] = [_,_];
-    const rotateArray: (string|number)[] = [_,_,_,_];
-    const translateArray: (string|number)[] = [_,_,_];
+    const scaleArray: number[] = [_, _, _];
+    const skewArray: (string | number)[] = [_, _];
+    const rotateArray: (string | number)[] = [_, _, _, _];
+    const translateArray: (string | number)[] = [_, _, _];
 
     const output: ja.IMap<any> = {};
 

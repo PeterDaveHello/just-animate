@@ -5,7 +5,6 @@ const slice = Array.prototype.slice;
  * Empty Value
  */
 export const _: any = undefined;
-Object.freeze(_);
 
 /**
  * No operation function: a placeholder
@@ -14,6 +13,15 @@ Object.freeze(_);
  */
 export function noop(): void {
     // do nothing
+}
+
+export function transformFunction(name: string, params: ja.IIndexed<string | number>): string {
+    return `${name}(${toArray(arguments, 1).join(',')})`;
+}
+
+
+export function replaceCamelCased(match: string, p1: string, p2: string): string {
+    return p1 + p2.toUpperCase();
 }
 
 /**
@@ -231,7 +239,7 @@ export function multiapply(targets: ja.IIndexed<any>, fnName: string, args: ja.I
             if (fnName) {
                 result = target[fnName].apply(target, args);
             } else {
-                result = target.apply(undefined, args);
+                result = target.apply(_, args);
             }
             if (isDefined(result)) {
                 results.push(result);

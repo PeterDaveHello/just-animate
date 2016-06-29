@@ -8,7 +8,7 @@ var utils_1 = require('./utils');
  */
 function resolveElements(source) {
     if (!source) {
-        throw Error('source is undefined');
+        throw Error('missing elements');
     }
     if (utils_1.isString(source)) {
         // if query selector, search for elements 

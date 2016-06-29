@@ -1,0 +1,26 @@
+export const hyphenToPascal = /([a-z])-([a-z])/ig;
+
+export const x = 0;
+export const y = 1;
+export const z = 2;
+export const cubicBezier = 'cubic-bezier';
+export const offset = 'offset';
+export const scale3d = 'scale3d';
+export const scale = 'scale';
+export const scaleX = 'scaleX';
+export const scaleY = 'scaleY';
+export const scaleZ = 'scaleZ';
+export const skew = 'skew';
+export const skewX = 'skewX';
+export const skewY = 'skewY';
+export const rotate3d = 'rotate3d';
+export const rotate = 'rotate';
+export const rotateX = 'rotateX';
+export const rotateY = 'rotateY';
+export const rotateZ = 'rotateZ';
+export const translate3d = 'translate3d';
+export const translate = 'translate';
+export const translateX = 'translateX';
+export const translateY = 'translateY';
+export const translateZ = 'translateZ';
+export const transform = 'transform';

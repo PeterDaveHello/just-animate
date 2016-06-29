@@ -1,5 +1,6 @@
 "use strict";
 var easings_1 = require('../easings');
+var literals_1 = require('./literals');
 var utils_1 = require('./utils');
 var Transformers_1 = require('./Transformers');
 var ElementResolver_1 = require('./ElementResolver');
@@ -38,9 +39,9 @@ var ElementAnimator = (function () {
         }
         if (timings && timings.easing) {
             // if timings contains an easing property, 
-            var easing = easings_1.easings[timings.easing];
-            if (easing) {
-                timings.easing = easing;
+            var cubicEasing = easings_1.cubicEasings[timings.easing];
+            if (cubicEasing) {
+                timings.easing = utils_1.transformFunction(literals_1.cubicBezier, cubicEasing);
             }
         }
         // add duration to object    

@@ -188,12 +188,7 @@ var SequenceAnimator = (function () {
         return it.animator;
     };
     SequenceAnimator.prototype._playNextStep = function (evt) {
-        if (this.playbackRate === -1) {
-            this._currentIndex--;
-        }
-        else {
-            this._currentIndex++;
-        }
+        this._currentIndex += this.playbackRate === -1 ? -1 : 1;
         if (this._isInEffect()) {
             this._playThisStep();
         }
@@ -204,12 +199,9 @@ var SequenceAnimator = (function () {
     SequenceAnimator.prototype._playThisStep = function () {
         var _this = this;
         if (!this._isInEffect()) {
-            if (this.playbackRate === -1) {
-                this._currentIndex = this._steps.length - 1;
-            }
-            else {
-                this._currentIndex = 0;
-            }
+            this._currentIndex = this.playbackRate === -1
+                ? this._steps.length - 1
+                : 0;
         }
         var animator = this._getAnimator();
         animator.onfinish = function (evt) {

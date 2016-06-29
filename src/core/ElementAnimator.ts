@@ -1,5 +1,6 @@
-import {easings} from '../easings';
-import {head, multiapply, map, each, extend, isFunction, isString, max} from './utils';
+import {cubicEasings} from '../easings';
+import {cubicBezier} from './literals';
+import {head, multiapply, map, each, extend, isFunction, isString, max, transformFunction} from './utils';
 import {keyframeTransformer, normalizeKeyframes } from './Transformers';
 import {resolveElements} from './ElementResolver';
 
@@ -77,9 +78,9 @@ export class ElementAnimator implements ja.IAnimator {
 
         if (timings && timings.easing) {
             // if timings contains an easing property, 
-            const easing = easings[timings.easing];
-            if (easing) {
-                timings.easing = easing;
+            const cubicEasing = cubicEasings[timings.easing];
+            if (cubicEasing) {
+                timings.easing = transformFunction(cubicBezier, cubicEasing);
             }
         }
 

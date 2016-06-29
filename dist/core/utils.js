@@ -5,7 +5,6 @@ var slice = Array.prototype.slice;
  * Empty Value
  */
 exports._ = undefined;
-Object.freeze(exports._);
 /**
  * No operation function: a placeholder
  *
@@ -15,6 +14,14 @@ function noop() {
     // do nothing
 }
 exports.noop = noop;
+function transformFunction(name, params) {
+    return name + "(" + toArray(arguments, 1).join(',') + ")";
+}
+exports.transformFunction = transformFunction;
+function replaceCamelCased(match, p1, p2) {
+    return p1 + p2.toUpperCase();
+}
+exports.replaceCamelCased = replaceCamelCased;
 /**
  * Copies the values from source into target
  */
@@ -236,7 +243,7 @@ function multiapply(targets, fnName, args, cb) {
                 result = target[fnName].apply(target, args);
             }
             else {
-                result = target.apply(undefined, args);
+                result = target.apply(exports._, args);
             }
             if (isDefined(result)) {
                 results.push(result);

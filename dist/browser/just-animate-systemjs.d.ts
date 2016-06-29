@@ -9,6 +9,8 @@ declare module "just-animate/core/utils" {
      * @export
      */
     export function noop(): void;
+    export function transformFunction(name: string, params: ja.IIndexed<string | number>): string;
+    export function replaceCamelCased(match: string, p1: string, p2: string): string;
     /**
      * Copies the values from source into target
      */
@@ -140,6 +142,33 @@ declare module "just-animate/core/utils" {
 declare module "just-animate/core/errors" {
     export function argumentError(name: string): void;
 }
+declare module "just-animate/core/literals" {
+    export const hyphenToPascal: RegExp;
+    export const x: number;
+    export const y: number;
+    export const z: number;
+    export const cubicBezier: string;
+    export const offset: string;
+    export const scale3d: string;
+    export const scale: string;
+    export const scaleX: string;
+    export const scaleY: string;
+    export const scaleZ: string;
+    export const skew: string;
+    export const skewX: string;
+    export const skewY: string;
+    export const rotate3d: string;
+    export const rotate: string;
+    export const rotateX: string;
+    export const rotateY: string;
+    export const rotateZ: string;
+    export const translate3d: string;
+    export const translate: string;
+    export const translateX: string;
+    export const translateY: string;
+    export const translateZ: string;
+    export const transform: string;
+}
 declare module "just-animate/core/Transformers" {
     /**
      * Handles converting animations options to a usable format
@@ -155,7 +184,7 @@ declare module "just-animate/core/Transformers" {
     export function keyframeTransformer(keyframe: ja.IKeyframe): ja.IKeyframe;
 }
 declare module "just-animate/easings" {
-    export const easings: ja.IMap<string>;
+    export const cubicEasings: ja.IMap<number[]>;
 }
 declare module "just-animate/core/ElementResolver" {
     /**
@@ -818,7 +847,4 @@ declare module "just-animate/index" {
     import * as animations from "just-animate/animations";
     export { animations };
     export { JustAnimate } from "just-animate/JustAnimate";
-}
-declare module "just-animate/core/TImingHelpers" {
-    export function cubic(p0: number, p1: number, p2: number, p3: number): ja.IFunc<number>;
 }
