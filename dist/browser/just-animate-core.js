@@ -3,16 +3,36 @@
 
     var ostring = Object.prototype.toString;
     var slice = Array.prototype.slice;
+    var _ = undefined;
+    Object.freeze(_);
     function noop() {
     }
+    function transfer(target, source) {
+        for (var i = 0, len = target.length; i < len; i++) {
+            var val = source[i];
+            if (val !== _) {
+                target[i] = source[i];
+            }
+        }
+        return target;
+    }
+    function fill(target, emptyVal, force) {
+        for (var i = 0, len = target.length; i < len; i++) {
+            var val = target[i];
+            if (!force || val === _) {
+                target[i] = emptyVal;
+            }
+        }
+        return target;
+    }
     function head(indexed) {
-        return (!indexed || indexed.length < 1) ? undefined : indexed[0];
+        return (!indexed || indexed.length < 1) ? _ : indexed[0];
     }
     function isArray(a) {
         return !isString(a) && isNumber(a.length);
     }
     function isDefined(a) {
-        return a !== undefined && a !== null && a !== '';
+        return a !== _ && a !== null && a !== '';
     }
     function isFunction(a) {
         return ostring.call(a) === '[object Function]';
@@ -23,8 +43,8 @@
     function isString(a) {
         return typeof a === 'string';
     }
-    function toArray(indexed) {
-        return slice.call(indexed, 0);
+    function toArray(indexed, start) {
+        return slice.call(indexed, start || 0);
     }
     function each(items, fn) {
         for (var i = 0, len = items.length; i < len; i++) {
@@ -46,7 +66,7 @@
         var results = [];
         for (var i = 0, len = items.length; i < len; i++) {
             var result = fn(items[i]);
-            if (result !== undefined) {
+            if (isDefined(result)) {
                 results.push(result);
             }
         }
@@ -78,7 +98,7 @@
                 else {
                     result = target.apply(undefined, args);
                 }
-                if (result !== undefined) {
+                if (isDefined(result)) {
                     results.push(result);
                 }
             }
@@ -92,11 +112,39 @@
         return results;
     }
 
+    function argumentError(name) {
+        throw new Error("invalid parameter: " + name);
+    }
+
+    var hyphenToPascal = /([a-z])-([a-z])/ig;
     var x = 0;
     var y = 1;
     var z = 2;
+    var offset = 'offset';
+    var scale3d = 'scale3d';
+    var scale = 'scale';
+    var scaleX = 'scaleX';
+    var scaleY = 'scaleY';
+    var scaleZ = 'scaleZ';
+    var skew = 'skew';
+    var skewX = 'skewX';
+    var skewY = 'skewY';
+    var rotate3d = 'rotate3d';
+    var rotate = 'rotate';
+    var rotateX = 'rotateX';
+    var rotateY = 'rotateY';
+    var rotateZ = 'rotateZ';
+    var translate3d = 'translate3d';
+    var translate = 'translate';
+    var translateX = 'translateX';
+    var translateY = 'translateY';
+    var translateZ = 'translateZ';
+    var transform = 'transform';
     function replaceCamelCased(match, p1, p2) {
         return p1 + p2.toUpperCase();
+    }
+    function transformFunction(name, params) {
+        return name + "(" + toArray(arguments, 1).join(',') + ")";
     }
     function animationTransformer(a) {
         var keyframes = map(a.keyframes, keyframeTransformer);
@@ -112,10 +160,10 @@
             return keyframes;
         }
         var first = keyframes[0];
-        var last = keyframes[len - 1];
         if (first.offset !== 0) {
             first.offset = 0;
         }
+        var last = keyframes[len - 1];
         if (last.offset !== 1) {
             last.offset = 1;
         }
@@ -143,7 +191,7 @@
         for (var i = 1; i < len; i++) {
             var keyframe = keyframes[i];
             for (var prop in keyframe) {
-                if (prop === 'offset' || isDefined(first[prop])) {
+                if (prop === offset || isDefined(first[prop])) {
                     continue;
                 }
                 first[prop] = keyframe[prop];
@@ -152,7 +200,7 @@
         for (var i = len - 2; i > -1; i--) {
             var keyframe = keyframes[i];
             for (var prop in keyframe) {
-                if (prop === 'offset' || isDefined(last[prop])) {
+                if (prop === offset || isDefined(last[prop])) {
                     continue;
                 }
                 last[prop] = keyframe[prop];
@@ -161,275 +209,220 @@
         return keyframes;
     }
     function keyframeTransformer(keyframe) {
-        var scale = new Array(3);
-        var skew = new Array(2);
-        var translate = new Array(3);
+        var scaleArray = [_, _, _];
+        var skewArray = [_, _];
+        var rotateArray = [_, _, _, _];
+        var translateArray = [_, _, _];
         var output = {};
-        var transform = '';
         for (var prop in keyframe) {
             var value = keyframe[prop];
-            if (value === undefined || value === null || value === '') {
+            if (!isDefined(value)) {
                 continue;
             }
             switch (prop) {
-                case 'scale3d':
+                case scale3d:
+                    if (isNumber(value)) {
+                        transfer(scaleArray, [value, value, value]);
+                        continue;
+                    }
                     if (isArray(value)) {
                         var arr = value;
                         if (arr.length !== 3) {
-                            throw Error('scale3d requires x, y, & z');
+                            argumentError(scale3d);
                         }
-                        scale[x] = arr[x];
-                        scale[y] = arr[y];
-                        scale[z] = arr[z];
+                        transfer(scaleArray, arr);
                         continue;
                     }
-                    if (isNumber(value)) {
-                        scale[x] = value;
-                        scale[y] = value;
-                        scale[z] = value;
-                        continue;
-                    }
-                    throw Error('scale3d requires a number or number[]');
-                case 'scale':
+                    argumentError(scale3d);
+                case scale:
                     if (isArray(value)) {
                         var arr = value;
                         if (arr.length !== 2) {
-                            throw Error('scale requires x & y');
+                            argumentError(scale);
                         }
-                        scale[x] = arr[x];
-                        scale[y] = arr[y];
+                        transfer(scaleArray, [arr[x], arr[y], _]);
                         continue;
                     }
                     if (isNumber(value)) {
-                        scale[x] = value;
-                        scale[y] = value;
+                        transfer(scaleArray, [value, value, _]);
                         continue;
                     }
-                    throw Error('scale requires a number or number[]');
-                case 'scaleX':
+                    argumentError(scale);
+                case scaleX:
+                    if (!isNumber(value)) {
+                        argumentError(scaleX);
+                    }
+                    scaleArray[x] = value;
+                    break;
+                case scaleY:
+                    if (!isNumber(value)) {
+                        argumentError(scaleY);
+                    }
+                    scaleArray[y] = value;
+                    break;
+                case scaleZ:
                     if (isNumber(value)) {
-                        scale[x] = value;
-                        continue;
+                        argumentError(scaleZ);
                     }
-                    throw Error('scaleX requires a number');
-                case 'scaleY':
+                    scaleArray[z] = value;
+                    break;
+                case skew:
                     if (isNumber(value)) {
-                        scale[y] = value;
+                        transfer(skewArray, [value, value]);
                         continue;
                     }
-                    throw Error('scaleY requires a number');
-                case 'scaleZ':
-                    if (isNumber(value)) {
-                        scale[z] = value;
-                        continue;
-                    }
-                    throw Error('scaleZ requires a number');
-                case 'skew':
                     if (isArray(value)) {
                         var arr = value;
-                        if (arr.length !== 2) {
-                            throw Error('skew requires x & y');
+                        if (arr.length === 2) {
+                            transfer(skewArray, arr);
                         }
-                        skew[x] = arr[x];
-                        skew[y] = arr[y];
+                        argumentError(skew);
                         continue;
                     }
-                    if (isNumber(value)) {
-                        skew[x] = value;
-                        skew[y] = value;
-                        continue;
-                    }
-                    throw Error('skew requires a number, string, string[], or number[]');
-                case 'skewX':
+                    argumentError(skew);
+                case skewX:
                     if (isString(value)) {
-                        skew[x] = value;
+                        skewArray[x] = value;
                         continue;
                     }
-                    throw Error('skewX requires a number or string');
-                case 'skewY':
+                    argumentError(skewX);
+                case skewY:
                     if (isString(value)) {
-                        skew[y] = value;
+                        skewArray[y] = value;
                         continue;
                     }
-                    throw Error('skewY requires a number or string');
-                case 'rotate3d':
+                    argumentError(skewY);
+                case rotate3d:
                     if (isArray(value)) {
                         var arr = value;
-                        if (arr.length !== 4) {
-                            throw Error('rotate3d requires x, y, z, & a');
+                        if (arr.length === 4) {
+                            transfer(rotateArray, arr);
                         }
-                        transform += " rotate3d(" + arr[0] + "," + arr[1] + "," + arr[2] + "," + arr[3] + ")";
-                        continue;
                     }
-                    throw Error('rotate3d requires an []');
-                case 'rotateX':
+                    argumentError(rotate3d);
+                case rotateX:
                     if (isString(value)) {
-                        transform += " rotate3d(1, 0, 0, " + value + ")";
+                        transfer(rotateArray, [1, 0, 0, value]);
                         continue;
                     }
-                    throw Error('rotateX requires a string');
-                case 'rotateY':
+                    argumentError(rotateX);
+                case rotateY:
                     if (isString(value)) {
-                        transform += " rotate3d(0, 1, 0, " + value + ")";
+                        transfer(rotateArray, [0, 1, 0, value]);
                         continue;
                     }
-                    throw Error('rotateY requires a string');
-                case 'rotate':
-                case 'rotateZ':
+                    argumentError(rotateY);
+                case rotate:
+                case rotateZ:
                     if (isString(value)) {
-                        transform += " rotate3d(0, 0, 1, " + value + ")";
+                        transfer(rotateArray, [0, 0, 1, value]);
                         continue;
                     }
-                    throw Error('rotateZ requires a string');
-                case 'translate3d':
+                    argumentError(rotateZ);
+                case translate3d:
+                    if (isString(value) || isNumber(value)) {
+                        transfer(translateArray, [value, value, value]);
+                        continue;
+                    }
                     if (isArray(value)) {
                         var arr = value;
                         if (arr.length !== 3) {
-                            throw Error('translate3d requires x, y, & z');
+                            argumentError(translate3d);
                         }
-                        translate[x] = arr[x];
-                        translate[y] = arr[y];
-                        translate[z] = arr[z];
+                        transfer(translateArray, arr);
                         continue;
                     }
+                    argumentError(translate3d);
+                case translate:
                     if (isString(value) || isNumber(value)) {
-                        translate[x] = value;
-                        translate[y] = value;
-                        translate[z] = value;
+                        transfer(translateArray, [value, value, _]);
                         continue;
                     }
-                    throw Error('translate3d requires a number, string, string[], or number[]');
-                case 'translate':
                     if (isArray(value)) {
                         var arr = value;
                         if (arr.length !== 2) {
-                            throw Error('translate requires x & y');
+                            argumentError(translate);
                         }
-                        translate[x] = arr[x];
-                        translate[y] = arr[y];
+                        transfer(translateArray, [arr[x], arr[y], _]);
                         continue;
                     }
+                    argumentError(translate);
+                case translateX:
                     if (isString(value) || isNumber(value)) {
-                        translate[x] = value;
-                        translate[y] = value;
+                        translateArray[x] = value;
                         continue;
                     }
-                    throw Error('translate requires a number, string, string[], or number[]');
-                case 'translateX':
+                    argumentError(translateX);
+                case translateY:
                     if (isString(value) || isNumber(value)) {
-                        translate[x] = value;
+                        translateArray[y] = value;
                         continue;
                     }
-                    throw Error('translateX requires a number or string');
-                case 'translateY':
+                    argumentError(translateY);
+                case translateZ:
                     if (isString(value) || isNumber(value)) {
-                        translate[y] = value;
+                        translateArray[z] = value;
                         continue;
                     }
-                    throw Error('translateY requires a number or string');
-                case 'translateZ':
-                    if (isString(value) || isNumber(value)) {
-                        translate[z] = value;
-                        continue;
-                    }
-                    throw Error('translateZ requires a number or string');
-                case 'transform':
-                    transform += ' ' + value;
+                    argumentError(translateZ);
+                case transform:
+                    translateArray.push(value);
                     break;
                 default:
-                    var prop2 = prop.replace(/([a-z])-([a-z])/ig, replaceCamelCased);
+                    var prop2 = prop.replace(hyphenToPascal, replaceCamelCased);
                     output[prop2] = value;
                     break;
             }
         }
-        var isScaleX = scale[x] !== undefined;
-        var isScaleY = scale[y] !== undefined;
-        var isScaleZ = scale[z] !== undefined;
-        if (isScaleX && isScaleZ || isScaleY && isScaleZ) {
-            var scaleString = scale.map(function (s) { return s || '1'; }).join(',');
-            transform += " scale3d(" + scaleString + ")";
+        var transformArray = [];
+        if (scaleArray.some(isDefined)) {
+            transformArray[scale3d] = transformFunction(scale3d, scaleArray);
         }
-        else if (isScaleX && isScaleY) {
-            transform += " scale(" + (scale[x] || 1) + ", " + (scale[y] || 1) + ")";
+        if (translateArray.some(isDefined)) {
+            translateArray[translate3d] = transformFunction(translate3d, fill(translateArray, 0));
         }
-        else if (isScaleX) {
-            transform += " scaleX(" + scale[x] + ")";
+        if (skewArray.some(isDefined)) {
+            transformArray[skew] = transformFunction(skew, fill(skewArray, 0));
         }
-        else if (isScaleY) {
-            transform += " scaleX(" + scale[y] + ")";
+        if (rotateArray.some(isDefined)) {
+            translateArray[translate3d] = transformFunction(rotate, fill(rotateArray, 0));
         }
-        else if (isScaleZ) {
-            transform += " scaleX(" + scale[z] + ")";
-        }
-        else {
-        }
-        var isskewX = skew[x] !== undefined;
-        var isskewY = skew[y] !== undefined;
-        if (isskewX && isskewY) {
-            transform += " skew(" + (skew[x] || 1) + ", " + (skew[y] || 1) + ")";
-        }
-        else if (isskewX) {
-            transform += " skewX(" + skew[x] + ")";
-        }
-        else if (isskewY) {
-            transform += " skewX(" + skew[y] + ")";
-        }
-        else {
-        }
-        var istranslateX = translate[x] !== undefined;
-        var istranslateY = translate[y] !== undefined;
-        var istranslateZ = translate[z] !== undefined;
-        if (istranslateX && istranslateZ || istranslateY && istranslateZ) {
-            var translateString = translate.map(function (s) { return s || '1'; }).join(',');
-            transform += " translate3d(" + translateString + ")";
-        }
-        else if (istranslateX && istranslateY) {
-            transform += " translate(" + (translate[x] || 1) + ", " + (translate[y] || 1) + ")";
-        }
-        else if (istranslateX) {
-            transform += " translateX(" + translate[x] + ")";
-        }
-        else if (istranslateY) {
-            transform += " translateX(" + translate[y] + ")";
-        }
-        else if (istranslateZ) {
-            transform += " translateX(" + translate[z] + ")";
-        }
-        else {
-        }
-        if (transform) {
-            output['transform'] = transform;
+        if (transformArray.length) {
+            output[transform] = transformArray.join(' ');
         }
         return output;
     }
 
     var easings = {
-        easeInBack: 'cubic-bezier(0.600, -0.280, 0.735, 0.045)',
-        easeInCirc: 'cubic-bezier(0.600, 0.040, 0.980, 0.335)',
-        easeInCubic: 'cubic-bezier(0.550, 0.055, 0.675, 0.190)',
-        easeInExpo: 'cubic-bezier(0.950, 0.050, 0.795, 0.035)',
-        easeInOutBack: 'cubic-bezier(0.680, -0.550, 0.265, 1.550)',
-        easeInOutCirc: 'cubic-bezier(0.785, 0.135, 0.150, 0.860)',
-        easeInOutCubic: 'cubic-bezier(0.645, 0.045, 0.355, 1.000)',
-        easeInOutExpo: 'cubic-bezier(1.000, 0.000, 0.000, 1.000)',
-        easeInOutQuad: 'cubic-bezier(0.455, 0.030, 0.515, 0.955)',
-        easeInOutQuart: 'cubic-bezier(0.770, 0.000, 0.175, 1.000)',
-        easeInOutQuint: 'cubic-bezier(0.860, 0.000, 0.070, 1.000)',
-        easeInOutSine: 'cubic-bezier(0.445, 0.050, 0.550, 0.950)',
-        easeInQuad: 'cubic-bezier(0.550, 0.085, 0.680, 0.530)',
-        easeInQuart: 'cubic-bezier(0.895, 0.030, 0.685, 0.220)',
-        easeInQuint: 'cubic-bezier(0.755, 0.050, 0.855, 0.060)',
-        easeInSine: 'cubic-bezier(0.470, 0.000, 0.745, 0.715)',
-        easeOutBack: 'cubic-bezier(0.175,  0.885, 0.320, 1.275)',
-        easeOutCirc: 'cubic-bezier(0.075, 0.820, 0.165, 1.000)',
-        easeOutCubic: 'cubic-bezier(0.215, 0.610, 0.355, 1.000)',
-        easeOutExpo: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-        easeOutQuad: 'cubic-bezier(0.250, 0.460, 0.450, 0.940)',
-        easeOutQuart: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
-        easeOutQuint: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
-        easeOutSine: 'cubic-bezier(0.390, 0.575, 0.565, 1.000)',
-        elegantSlowStartEnd: 'cubic-bezier(0.175, 0.885, 0.320, 1.275)'
+        easeInBack: cubicBezier(0.600, -0.280, 0.735, 0.045),
+        easeInCirc: cubicBezier(0.600, 0.040, 0.980, 0.335),
+        easeInCubic: cubicBezier(0.550, 0.055, 0.675, 0.190),
+        easeInExpo: cubicBezier(0.950, 0.050, 0.795, 0.035),
+        easeInOutBack: cubicBezier(0.680, -0.550, 0.265, 1.550),
+        easeInOutCirc: cubicBezier(0.785, 0.135, 0.150, 0.860),
+        easeInOutCubic: cubicBezier(0.645, 0.045, 0.355, 1.000),
+        easeInOutExpo: cubicBezier(1.000, 0.000, 0.000, 1.000),
+        easeInOutQuad: cubicBezier(0.455, 0.030, 0.515, 0.955),
+        easeInOutQuart: cubicBezier(0.770, 0.000, 0.175, 1.000),
+        easeInOutQuint: cubicBezier(0.860, 0.000, 0.070, 1.000),
+        easeInOutSine: cubicBezier(0.445, 0.050, 0.550, 0.950),
+        easeInQuad: cubicBezier(0.550, 0.085, 0.680, 0.530),
+        easeInQuart: cubicBezier(0.895, 0.030, 0.685, 0.220),
+        easeInQuint: cubicBezier(0.755, 0.050, 0.855, 0.060),
+        easeInSine: cubicBezier(0.470, 0.000, 0.745, 0.715),
+        easeOutBack: cubicBezier(0.175, 0.885, 0.320, 1.275),
+        easeOutCirc: cubicBezier(0.075, 0.820, 0.165, 1.000),
+        easeOutCubic: cubicBezier(0.215, 0.610, 0.355, 1.000),
+        easeOutExpo: cubicBezier(0.190, 1.000, 0.220, 1.000),
+        easeOutQuad: cubicBezier(0.250, 0.460, 0.450, 0.940),
+        easeOutQuart: cubicBezier(0.165, 0.840, 0.440, 1.000),
+        easeOutQuint: cubicBezier(0.230, 1.000, 0.320, 1.000),
+        easeOutSine: cubicBezier(0.390, 0.575, 0.565, 1.000),
+        elegantSlowStartEnd: cubicBezier(0.175, 0.885, 0.320, 1.275)
     };
+    function cubicBezier(p1, p2, p3, p4) {
+        return 'cubic-bezier(' + [p1, p2, p3, p4].join(' ') + ')';
+    }
 
     function resolveElements(source) {
         if (!source) {
@@ -615,7 +608,7 @@
             this._currentIndex = -1;
             for (var x = 0; x < this._steps.length; x++) {
                 var step = this._steps[x];
-                if (step.animator !== undefined) {
+                if (isDefined(step.animator)) {
                     step.animator.cancel(fn);
                 }
             }
@@ -647,11 +640,11 @@
         };
         SequenceAnimator.prototype.cancel = function (fn) {
             this._errorCallback = fn;
-            this.playbackRate = undefined;
+            this.playbackRate = _;
             this._currentIndex = -1;
             for (var x = 0; x < this._steps.length; x++) {
                 var step = this._steps[x];
-                if (step.animator !== undefined) {
+                if (isDefined(step.animator)) {
                     step.animator.cancel(fn);
                 }
             }
@@ -708,7 +701,7 @@
     var TimelineAnimator = (function () {
         function TimelineAnimator(manager, options) {
             var duration = options.duration;
-            if (duration === undefined) {
+            if (!isDefined(duration)) {
                 throw Error('Duration is required');
             }
             this.playbackRate = 0;
@@ -783,7 +776,7 @@
             }
             var thisTick = performance.now();
             var lastTick = this._lastTick;
-            if (lastTick !== undefined) {
+            if (isDefined(lastTick)) {
                 var delta = (thisTick - lastTick) * this.playbackRate;
                 this.currentTime += delta;
             }
@@ -823,7 +816,7 @@
         TimelineAnimator.prototype._triggerPause = function () {
             this._isPaused = true;
             this._isInEffect = false;
-            this._lastTick = undefined;
+            this._lastTick = _;
             this.playbackRate = 0;
             each(this._events, function (evt) {
                 evt.isInEffect = false;
@@ -832,7 +825,7 @@
         };
         TimelineAnimator.prototype._reset = function () {
             this.currentTime = 0;
-            this._lastTick = undefined;
+            this._lastTick = _;
             this._isCanceled = false;
             this._isFinished = false;
             this._isPaused = false;
@@ -881,7 +874,7 @@
         }
         Object.defineProperty(TimelineEvent.prototype, "animator", {
             get: function () {
-                if (this._animator === undefined) {
+                if (!isDefined(this._animator)) {
                     this._animator = this._manager.animate(this.keyframes, this.el, this.timings);
                     this._animator.pause();
                 }
@@ -927,7 +920,7 @@
     }
     var animationManager = undefined;
     function getManager() {
-        if (animationManager === undefined) {
+        if (!isDefined(animationManager)) {
             animationManager = new JustAnimate();
         }
         return animationManager;
@@ -946,9 +939,6 @@
             return getManager().findAnimation(name);
         },
         inject: function (animations) {
-            if (animationManager !== undefined) {
-                console.warn('Animations must be injected prior to using Just.*');
-            }
             JustAnimate.inject(animations);
         },
         register: function (animationOptions) {

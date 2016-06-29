@@ -1,10 +1,19 @@
 declare module "just-animate/core/utils" {
     /**
+     * Empty Value
+     */
+    export const _: any;
+    /**
      * No operation function: a placeholder
      *
      * @export
      */
     export function noop(): void;
+    /**
+     * Copies the values from source into target
+     */
+    export function transfer<T>(target: ja.IIndexed<T>, source: ja.IIndexed<T>): ja.IIndexed<T>;
+    export function fill<T>(target: ja.IIndexed<T>, emptyVal: T, force?: boolean): ja.IIndexed<T>;
     /**
      * Clamps a number between the min and max
      *
@@ -75,7 +84,7 @@ declare module "just-animate/core/utils" {
      * @param {ja.IIndexed<T>} list to convert
      * @returns {T[]} array clone of list
      */
-    export function toArray<T>(indexed: ja.IIndexed<T>): T[];
+    export function toArray<T>(indexed: ja.IIndexed<T>, start?: number): T[];
     /**
      * Performs the function against all objects in the list
      *
@@ -127,6 +136,9 @@ declare module "just-animate/core/utils" {
      * @returns {any[]} all results as an array
      */
     export function multiapply(targets: ja.IIndexed<any>, fnName: string, args: ja.IIndexed<any>, cb?: ja.ICallbackHandler): any[];
+}
+declare module "just-animate/core/errors" {
+    export function argumentError(name: string): void;
 }
 declare module "just-animate/core/Transformers" {
     /**

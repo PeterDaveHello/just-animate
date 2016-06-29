@@ -2,12 +2,41 @@ const ostring = Object.prototype.toString;
 const slice = Array.prototype.slice;
 
 /**
+ * Empty Value
+ */
+export const _: any = undefined;
+Object.freeze(_);
+
+/**
  * No operation function: a placeholder
  * 
  * @export
  */
 export function noop(): void {
     // do nothing
+}
+
+/**
+ * Copies the values from source into target
+ */
+export function transfer<T>(target: ja.IIndexed<T>, source: ja.IIndexed<T>): ja.IIndexed<T> {
+    for (let i = 0, len = target.length; i < len; i++) {
+        const val = source[i];
+        if (val !== _) {
+            target[i] = source[i];
+        }
+    }
+    return target;
+}
+
+export function fill<T>(target: ja.IIndexed<T>, emptyVal: T, force?: boolean): ja.IIndexed<T> {
+    for (let i = 0, len = target.length; i < len; i++) {
+        const val = target[i];
+        if (!force || val === _) {
+            target[i] = emptyVal;
+        }
+    }
+    return target;
 }
 
 /**
@@ -20,7 +49,7 @@ export function noop(): void {
  * @returns {number} val if between min-max, min if lesser, max if greater
  */
 export function clamp(val: number, min: number, max: number): number {
-    return val === undefined ? undefined : val < min ? min : val > max ? max : val;
+    return val === _ ? _ : val < min ? min : val > max ? max : val;
 }
 
 /**
@@ -32,7 +61,7 @@ export function clamp(val: number, min: number, max: number): number {
  * @returns {T} first object in the list or undefined
  */
 export function head<T>(indexed: ja.IIndexed<T>): T {
-    return (!indexed || indexed.length < 1) ? undefined : indexed[0];
+    return (!indexed || indexed.length < 1) ? _ : indexed[0];
 }
 /**
  * Returns the last object in the list or undefined
@@ -43,7 +72,7 @@ export function head<T>(indexed: ja.IIndexed<T>): T {
  * @returns {T} last object in the list or undefined
  */
 export function tail<T>(indexed: ja.IIndexed<T>): T {
-    return (!indexed || indexed.length < 1) ? undefined : indexed[indexed.length - 1];
+    return (!indexed || indexed.length < 1) ? _ : indexed[indexed.length - 1];
 }
 
 /**
@@ -58,7 +87,7 @@ export function isArray(a: any): boolean {
 }
 
 export function isDefined(a: any): boolean {
-    return a !== undefined && a !== null && a !== '';
+    return a !== _ && a !== null && a !== '';
 }
 
 /**
@@ -103,8 +132,8 @@ export function isString(a: any): boolean {
  * @param {ja.IIndexed<T>} list to convert
  * @returns {T[]} array clone of list
  */
-export function toArray<T>(indexed: ja.IIndexed<T>): T[] {
-    return slice.call(indexed, 0);
+export function toArray<T>(indexed: ja.IIndexed<T>, start?: number): T[] {
+    return slice.call(indexed, start || 0);
 }
 
 /**
@@ -157,7 +186,7 @@ export function map<T1, T2>(items: ja.IIndexed<T1>, fn: ja.IMapper<T1, T2>): T2[
     const results = [] as T2[];
     for (let i = 0, len = items.length; i < len; i++) {
         const result = fn(items[i]);
-        if (result !== undefined) {
+        if (isDefined(result)) {
             results.push(result);
         }
     }
@@ -204,7 +233,7 @@ export function multiapply(targets: ja.IIndexed<any>, fnName: string, args: ja.I
             } else {
                 result = target.apply(undefined, args);
             }
-            if (result !== undefined) {
+            if (isDefined(result)) {
                 results.push(result);
             }
         } catch (err) {

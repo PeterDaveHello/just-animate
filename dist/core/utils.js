@@ -2,6 +2,11 @@
 var ostring = Object.prototype.toString;
 var slice = Array.prototype.slice;
 /**
+ * Empty Value
+ */
+exports._ = undefined;
+Object.freeze(exports._);
+/**
  * No operation function: a placeholder
  *
  * @export
@@ -10,6 +15,29 @@ function noop() {
     // do nothing
 }
 exports.noop = noop;
+/**
+ * Copies the values from source into target
+ */
+function transfer(target, source) {
+    for (var i = 0, len = target.length; i < len; i++) {
+        var val = source[i];
+        if (val !== exports._) {
+            target[i] = source[i];
+        }
+    }
+    return target;
+}
+exports.transfer = transfer;
+function fill(target, emptyVal, force) {
+    for (var i = 0, len = target.length; i < len; i++) {
+        var val = target[i];
+        if (!force || val === exports._) {
+            target[i] = emptyVal;
+        }
+    }
+    return target;
+}
+exports.fill = fill;
 /**
  * Clamps a number between the min and max
  *
@@ -20,7 +48,7 @@ exports.noop = noop;
  * @returns {number} val if between min-max, min if lesser, max if greater
  */
 function clamp(val, min, max) {
-    return val === undefined ? undefined : val < min ? min : val > max ? max : val;
+    return val === exports._ ? exports._ : val < min ? min : val > max ? max : val;
 }
 exports.clamp = clamp;
 /**
@@ -32,7 +60,7 @@ exports.clamp = clamp;
  * @returns {T} first object in the list or undefined
  */
 function head(indexed) {
-    return (!indexed || indexed.length < 1) ? undefined : indexed[0];
+    return (!indexed || indexed.length < 1) ? exports._ : indexed[0];
 }
 exports.head = head;
 /**
@@ -44,7 +72,7 @@ exports.head = head;
  * @returns {T} last object in the list or undefined
  */
 function tail(indexed) {
-    return (!indexed || indexed.length < 1) ? undefined : indexed[indexed.length - 1];
+    return (!indexed || indexed.length < 1) ? exports._ : indexed[indexed.length - 1];
 }
 exports.tail = tail;
 /**
@@ -59,7 +87,7 @@ function isArray(a) {
 }
 exports.isArray = isArray;
 function isDefined(a) {
-    return a !== undefined && a !== null && a !== '';
+    return a !== exports._ && a !== null && a !== '';
 }
 exports.isDefined = isDefined;
 /**
@@ -104,8 +132,8 @@ exports.isString = isString;
  * @param {ja.IIndexed<T>} list to convert
  * @returns {T[]} array clone of list
  */
-function toArray(indexed) {
-    return slice.call(indexed, 0);
+function toArray(indexed, start) {
+    return slice.call(indexed, start || 0);
 }
 exports.toArray = toArray;
 /**
@@ -158,7 +186,7 @@ function map(items, fn) {
     var results = [];
     for (var i = 0, len = items.length; i < len; i++) {
         var result = fn(items[i]);
-        if (result !== undefined) {
+        if (isDefined(result)) {
             results.push(result);
         }
     }
@@ -210,7 +238,7 @@ function multiapply(targets, fnName, args, cb) {
             else {
                 result = target.apply(undefined, args);
             }
-            if (result !== undefined) {
+            if (isDefined(result)) {
                 results.push(result);
             }
         }

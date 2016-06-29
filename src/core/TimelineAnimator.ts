@@ -1,4 +1,4 @@
-import {each, extend, isFunction, map} from './utils';
+import {each, extend, isFunction, map, isDefined, _} from './utils';
 
 // fixme!: this controls the amount of time left before the timeline gives up 
 // on individual animation and calls finish.  If an animation plays after its time, it looks
@@ -61,7 +61,7 @@ export class TimelineAnimator implements ja.IAnimator {
      */
     constructor(manager: ja.IAnimationManager, options: ja.ITimelineOptions) {
         const duration = options.duration;
-        if (duration === undefined) {
+        if (!isDefined(duration)) {
             throw Error('Duration is required');
         }
         this.playbackRate = 0;
@@ -176,7 +176,7 @@ export class TimelineAnimator implements ja.IAnimator {
         // calculate currentTime from delta
         const thisTick = performance.now();
         const lastTick = this._lastTick;
-        if (lastTick !== undefined) {
+        if (isDefined(lastTick)) {
             const delta = (thisTick - lastTick) * this.playbackRate;
             this.currentTime += delta;
         }
@@ -226,7 +226,7 @@ export class TimelineAnimator implements ja.IAnimator {
     private _triggerPause(): void {
         this._isPaused = true;
         this._isInEffect = false;
-        this._lastTick = undefined;
+        this._lastTick = _;
         this.playbackRate = 0;
         each(this._events, (evt: TimelineEvent) => {
             evt.isInEffect = false;
@@ -236,7 +236,7 @@ export class TimelineAnimator implements ja.IAnimator {
 
     private _reset(): void {
         this.currentTime = 0;
-        this._lastTick = undefined;
+        this._lastTick = _;
         this._isCanceled = false;
         this._isFinished = false;
         this._isPaused = false;
@@ -261,7 +261,7 @@ class TimelineEvent implements ja.ITimelineEvent {
     private _manager: ja.IAnimationManager;
 
     get animator(): ja.IAnimator {
-        if (this._animator === undefined) {
+        if (!isDefined(this._animator)) {
             this._animator = this._manager.animate(this.keyframes, this.el, this.timings);
             this._animator.pause();
         }

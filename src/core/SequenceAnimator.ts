@@ -1,4 +1,4 @@
-import {extend, isFunction, map, noop} from './utils';
+import {extend, isFunction, map, noop, isDefined, _} from './utils';
 
 /**
  * (description)
@@ -134,7 +134,7 @@ export class SequenceAnimator implements ja.IAnimator {
         
         for (let x = 0; x < this._steps.length; x++) {
             const step = this._steps[x];
-            if (step.animator !== undefined) {
+            if (isDefined(step.animator)) {
                 step.animator.cancel(fn);
             }
         }
@@ -191,11 +191,11 @@ export class SequenceAnimator implements ja.IAnimator {
      */
     public cancel(fn?: ja.ICallbackHandler): ja.IAnimator {
         this._errorCallback = fn;
-        this.playbackRate = undefined;
+        this.playbackRate = _;
         this._currentIndex = -1;
         for (let x = 0; x < this._steps.length; x++) {
             const step = this._steps[x];
-            if (step.animator !== undefined) {
+            if (isDefined(step.animator)) {
                 step.animator.cancel(fn);
             }
         }

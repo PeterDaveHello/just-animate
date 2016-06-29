@@ -106,7 +106,7 @@ var SequenceAnimator = (function () {
         this._currentIndex = -1;
         for (var x = 0; x < this._steps.length; x++) {
             var step = this._steps[x];
-            if (step.animator !== undefined) {
+            if (utils_1.isDefined(step.animator)) {
                 step.animator.cancel(fn);
             }
         }
@@ -163,11 +163,11 @@ var SequenceAnimator = (function () {
      */
     SequenceAnimator.prototype.cancel = function (fn) {
         this._errorCallback = fn;
-        this.playbackRate = undefined;
+        this.playbackRate = utils_1._;
         this._currentIndex = -1;
         for (var x = 0; x < this._steps.length; x++) {
             var step = this._steps[x];
-            if (step.animator !== undefined) {
+            if (utils_1.isDefined(step.animator)) {
                 step.animator.cancel(fn);
             }
         }

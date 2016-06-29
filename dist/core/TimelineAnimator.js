@@ -20,7 +20,7 @@ var TimelineAnimator = (function () {
      */
     function TimelineAnimator(manager, options) {
         var duration = options.duration;
-        if (duration === undefined) {
+        if (!utils_1.isDefined(duration)) {
             throw Error('Duration is required');
         }
         this.playbackRate = 0;
@@ -128,7 +128,7 @@ var TimelineAnimator = (function () {
         // calculate currentTime from delta
         var thisTick = performance.now();
         var lastTick = this._lastTick;
-        if (lastTick !== undefined) {
+        if (utils_1.isDefined(lastTick)) {
             var delta = (thisTick - lastTick) * this.playbackRate;
             this.currentTime += delta;
         }
@@ -170,7 +170,7 @@ var TimelineAnimator = (function () {
     TimelineAnimator.prototype._triggerPause = function () {
         this._isPaused = true;
         this._isInEffect = false;
-        this._lastTick = undefined;
+        this._lastTick = utils_1._;
         this.playbackRate = 0;
         utils_1.each(this._events, function (evt) {
             evt.isInEffect = false;
@@ -179,7 +179,7 @@ var TimelineAnimator = (function () {
     };
     TimelineAnimator.prototype._reset = function () {
         this.currentTime = 0;
-        this._lastTick = undefined;
+        this._lastTick = utils_1._;
         this._isCanceled = false;
         this._isFinished = false;
         this._isPaused = false;
@@ -231,7 +231,7 @@ var TimelineEvent = (function () {
     }
     Object.defineProperty(TimelineEvent.prototype, "animator", {
         get: function () {
-            if (this._animator === undefined) {
+            if (!utils_1.isDefined(this._animator)) {
                 this._animator = this._manager.animate(this.keyframes, this.el, this.timings);
                 this._animator.pause();
             }
