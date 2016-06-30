@@ -40,7 +40,7 @@ export function transfer<T>(target: ja.IIndexed<T>, source: ja.IIndexed<T>): ja.
 export function fill<T>(target: ja.IIndexed<T>, emptyVal: T, force?: boolean): ja.IIndexed<T> {
     for (let i = 0, len = target.length; i < len; i++) {
         const val = target[i];
-        if (!force || val === _) {
+        if (force || val === _) {
             target[i] = emptyVal;
         }
     }

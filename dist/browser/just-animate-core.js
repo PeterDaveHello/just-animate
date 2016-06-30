@@ -24,7 +24,7 @@
     function fill(target, emptyVal, force) {
         for (var i = 0, len = target.length; i < len; i++) {
             var val = target[i];
-            if (!force || val === _) {
+            if (force || val === _) {
                 target[i] = emptyVal;
             }
         }
@@ -221,6 +221,9 @@
                 continue;
             }
             switch (prop) {
+                case transform:
+                    output[prop] = value;
+                    continue;
                 case scale3d:
                     if (isNumber(value)) {
                         transfer(scaleArray, [value, value, value]);
@@ -254,19 +257,19 @@
                         argumentError(scaleX);
                     }
                     scaleArray[x] = value;
-                    break;
+                    continue;
                 case scaleY:
                     if (!isNumber(value)) {
                         argumentError(scaleY);
                     }
                     scaleArray[y] = value;
-                    break;
+                    continue;
                 case scaleZ:
                     if (isNumber(value)) {
                         argumentError(scaleZ);
                     }
                     scaleArray[z] = value;
-                    break;
+                    continue;
                 case skew:
                     if (isNumber(value)) {
                         transfer(skewArray, [value, value]);
@@ -366,27 +369,24 @@
                         continue;
                     }
                     argumentError(translateZ);
-                case transform:
-                    translateArray.push(value);
-                    break;
                 default:
                     var prop2 = prop.replace(hyphenToPascal, replaceCamelCased);
                     output[prop2] = value;
-                    break;
+                    continue;
             }
         }
         var transformArray = [];
         if (scaleArray.some(isDefined)) {
-            transformArray[scale3d] = transformFunction(scale3d, scaleArray);
+            transformArray.push(transformFunction(scale3d, scaleArray));
         }
         if (translateArray.some(isDefined)) {
-            translateArray[translate3d] = transformFunction(translate3d, fill(translateArray, 0));
+            transformArray.push(transformFunction(translate3d, fill(translateArray, 0)));
         }
         if (skewArray.some(isDefined)) {
-            transformArray[skew] = transformFunction(skew, fill(skewArray, 0));
+            transformArray.push(transformFunction(skew, fill(skewArray, 0)));
         }
         if (rotateArray.some(isDefined)) {
-            translateArray[translate3d] = transformFunction(rotate, fill(rotateArray, 0));
+            transformArray.push(transformFunction(rotate3d, fill(rotateArray, 0)));
         }
         if (transformArray.length) {
             output[transform] = transformArray.join(' ');

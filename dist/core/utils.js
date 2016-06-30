@@ -38,7 +38,7 @@ exports.transfer = transfer;
 function fill(target, emptyVal, force) {
     for (var i = 0, len = target.length; i < len; i++) {
         var val = target[i];
-        if (!force || val === exports._) {
+        if (force || val === exports._) {
             target[i] = emptyVal;
         }
     }

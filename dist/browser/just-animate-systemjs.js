@@ -35,7 +35,7 @@ System.register("just-animate/core/utils", [], function(exports_1, context_1) {
     function fill(target, emptyVal, force) {
         for (var i = 0, len = target.length; i < len; i++) {
             var val = target[i];
-            if (!force || val === _) {
+            if (force || val === _) {
                 target[i] = emptyVal;
             }
         }
@@ -419,6 +419,9 @@ System.register("just-animate/core/Transformers", ["just-animate/core/utils", "j
                 continue;
             }
             switch (prop) {
+                case literals_1.transform:
+                    output[prop] = value;
+                    continue;
                 case literals_1.scale3d:
                     if (utils_1.isNumber(value)) {
                         utils_1.transfer(scaleArray, [value, value, value]);
@@ -452,19 +455,19 @@ System.register("just-animate/core/Transformers", ["just-animate/core/utils", "j
                         errors_1.argumentError(literals_1.scaleX);
                     }
                     scaleArray[literals_1.x] = value;
-                    break;
+                    continue;
                 case literals_1.scaleY:
                     if (!utils_1.isNumber(value)) {
                         errors_1.argumentError(literals_1.scaleY);
                     }
                     scaleArray[literals_1.y] = value;
-                    break;
+                    continue;
                 case literals_1.scaleZ:
                     if (utils_1.isNumber(value)) {
                         errors_1.argumentError(literals_1.scaleZ);
                     }
                     scaleArray[literals_1.z] = value;
-                    break;
+                    continue;
                 case literals_1.skew:
                     if (utils_1.isNumber(value)) {
                         utils_1.transfer(skewArray, [value, value]);
@@ -564,27 +567,24 @@ System.register("just-animate/core/Transformers", ["just-animate/core/utils", "j
                         continue;
                     }
                     errors_1.argumentError(literals_1.translateZ);
-                case literals_1.transform:
-                    translateArray.push(value);
-                    break;
                 default:
                     var prop2 = prop.replace(literals_1.hyphenToPascal, utils_1.replaceCamelCased);
                     output[prop2] = value;
-                    break;
+                    continue;
             }
         }
         var transformArray = [];
         if (scaleArray.some(utils_1.isDefined)) {
-            transformArray[literals_1.scale3d] = utils_1.transformFunction(literals_1.scale3d, scaleArray);
+            transformArray.push(utils_1.transformFunction(literals_1.scale3d, scaleArray));
         }
         if (translateArray.some(utils_1.isDefined)) {
-            translateArray[literals_1.translate3d] = utils_1.transformFunction(literals_1.translate3d, utils_1.fill(translateArray, 0));
+            transformArray.push(utils_1.transformFunction(literals_1.translate3d, utils_1.fill(translateArray, 0)));
         }
         if (skewArray.some(utils_1.isDefined)) {
-            transformArray[literals_1.skew] = utils_1.transformFunction(literals_1.skew, utils_1.fill(skewArray, 0));
+            transformArray.push(utils_1.transformFunction(literals_1.skew, utils_1.fill(skewArray, 0)));
         }
         if (rotateArray.some(utils_1.isDefined)) {
-            translateArray[literals_1.translate3d] = utils_1.transformFunction(literals_1.rotate, utils_1.fill(rotateArray, 0));
+            transformArray.push(utils_1.transformFunction(literals_1.rotate3d, utils_1.fill(rotateArray, 0)));
         }
         if (transformArray.length) {
             output[literals_1.transform] = transformArray.join(' ');

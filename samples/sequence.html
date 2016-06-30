@@ -3,6 +3,7 @@
 <head>
     <title>Just Animate Demo</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+      <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <style>
         .container {
             margin-top: 1em;
@@ -58,39 +59,45 @@
     <script src="../../dist/browser/just-animate-core.js"></script>
     <script src="../../dist/browser/just-animate-animations.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-    <script>
-        (function() {
-            var steps = $('.step').map(function(){ 
-                return {
-                    el: this,
-                    name: 'rubberBand',
-                    timings: {
-                        duration: 450
-                    }
-                }
-            });
+    <script type="text/javascript">
+        var stepElements = document.querySelectorAll('.step');
+        var steps = [];
+        for (var i = 0; i < stepElements.length; i++) {
+            steps.push({
+                el: stepElements[i],
+                name: 'bounceIn'
+            })
+        }
+        
+        var player = Just.animateSequence({
+            steps: steps,
+            autoplay: false
+        });
             
-            var player = Just.animateSequence({
-                steps: steps,
-                autoplay: false
-            });
-            
-            $('#play').click(function() {
-                player.play();
-            });
-            $('#pause').click(function() {
-                player.pause();
-            });
-            $('#reverse').click(function() {
-                player.reverse();
-            });
-            $('#cancel').click(function() {
-                player.cancel();
-            });
-            $('#finish').click(function() {
-                player.finish();
-            });
-        })();
+        var playButton = document.getElementById('play');
+        playButton.addEventListener('click', function() {
+            player.play();
+        });
+        
+        var pauseButton = document.getElementById('pause');
+        pauseButton.addEventListener('click', function() {
+            player.pause();
+        });
+        
+        var reverseButton = document.getElementById('reverse');
+        reverseButton.addEventListener('click', function() {
+            player.reverse();
+        });
+        
+        var cancelButton = document.getElementById('cancel');
+        cancelButton.addEventListener('click', function() {
+            player.cancel();
+        });
+        
+        var finishButton = document.getElementById('finish');
+        finishButton.addEventListener('click', function() {
+            player.finish();
+        });
     </script>
 
 </body>
