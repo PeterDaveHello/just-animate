@@ -1,5 +1,6 @@
 import {each, extend, isFunction, map, isDefined, _} from './utils';
 import {argumentError} from './errors';
+import {duration} from './literals';
 
 // fixme!: this controls the amount of time left before the timeline gives up 
 // on individual animation and calls finish.  If an animation plays after its time, it looks
@@ -61,15 +62,15 @@ export class TimelineAnimator implements ja.IAnimator {
      * @param {ja.ITimelineOptions} options (description)
      */
     constructor(manager: ja.IAnimationManager, options: ja.ITimelineOptions) {
-        const duration = options.duration;
-        if (!isDefined(duration)) {
-            argumentError('duration');
+        const durationMs = options.duration;
+        if (!isDefined(durationMs)) {
+            argumentError(duration);
         }
         
         this.playbackRate = 0;
         this.duration = options.duration;
         this.currentTime = 0;
-        this._events = map(options.events, (evt: ja.ITimelineEvent) => new TimelineEvent(manager, duration, evt));
+        this._events = map(options.events, (evt: ja.ITimelineEvent) => new TimelineEvent(manager, durationMs, evt));
         this._isPaused = false;
         this._manager = manager;
 

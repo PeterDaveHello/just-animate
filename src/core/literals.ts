@@ -4,6 +4,7 @@ export const x = 0;
 export const y = 1;
 export const z = 2;
 export const cubicBezier = 'cubic-bezier';
+export const duration = 'duration';
 export const offset = 'offset';
 export const scale3d = 'scale3d';
 export const scale = 'scale';

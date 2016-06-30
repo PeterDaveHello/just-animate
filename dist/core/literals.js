@@ -4,6 +4,7 @@ exports.x = 0;
 exports.y = 1;
 exports.z = 2;
 exports.cubicBezier = 'cubic-bezier';
+exports.duration = 'duration';
 exports.offset = 'offset';
 exports.scale3d = 'scale3d';
 exports.scale = 'scale';

@@ -126,6 +126,7 @@
     var y = 1;
     var z = 2;
     var cubicBezier = 'cubic-bezier';
+    var duration = 'duration';
     var offset = 'offset';
     var scale3d = 'scale3d';
     var scale = 'scale';
@@ -690,14 +691,14 @@
     var animationPadding = 1.0 / 30;
     var TimelineAnimator = (function () {
         function TimelineAnimator(manager, options) {
-            var duration = options.duration;
-            if (!isDefined(duration)) {
-                argumentError('duration');
+            var durationMs = options.duration;
+            if (!isDefined(durationMs)) {
+                argumentError(duration);
             }
             this.playbackRate = 0;
             this.duration = options.duration;
             this.currentTime = 0;
-            this._events = map(options.events, function (evt) { return new TimelineEvent(manager, duration, evt); });
+            this._events = map(options.events, function (evt) { return new TimelineEvent(manager, durationMs, evt); });
             this._isPaused = false;
             this._manager = manager;
             this._tick = this._tick.bind(this);

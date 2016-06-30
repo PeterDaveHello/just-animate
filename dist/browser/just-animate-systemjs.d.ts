@@ -148,6 +148,7 @@ declare module "just-animate/core/literals" {
     export const y: number;
     export const z: number;
     export const cubicBezier: string;
+    export const duration: string;
     export const offset: string;
     export const scale3d: string;
     export const scale: string;

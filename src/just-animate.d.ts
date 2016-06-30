@@ -311,13 +311,8 @@ declare module ja {
          * 
          * @type {string}
          */
-        'all'?: string;
-        /**
-         * (description)
-         * 
-         * @type {string}
-         */
         'backdrop-filter'?: string;
+        backdropFilter?: string;
         /**
          * (description)
          * 
@@ -330,6 +325,7 @@ declare module ja {
          * @type {string}
          */
         'background-color'?: string;
+        backgroundColor?: string;
         /**
          * (description)
          * 
@@ -1005,7 +1001,7 @@ declare module ja {
          * 
          * @type {(string|string[])}
          */
-        'translate'?: string | string[];
+        'translate'?: number | string | (number|string)[];
         /**
          * Shortform for 'transform: translate3d()'.
          * Pass a single string to translate the same amount in all directions,
@@ -1013,28 +1009,28 @@ declare module ja {
          * 
          * @type {(string|string[])}
          */
-        'translate3d'?: string | string[];
+        'translate3d'?: number | string | (number|string)[];
         /**
          * Shortform for 'transform: translateX()'.
          * Pass a single string 
          * 
          * @type {string}
          */
-        'translateX'?: string;
+        'translateX'?: number|string;
         /**
          * Shortform for 'transform: translateY()'.
          * Pass a single string 
          * 
          * @type {string}
          */
-        'translateY'?: string;
+        'translateY'?: number|string;
         /**
          * Shortform for 'transform: translateZ()'.
          * Pass a single string 
          * 
          * @type {string}
          */
-        'translateZ'?: string;
+        'translateZ'?: number|string;
         /**
          * (description)
          * 

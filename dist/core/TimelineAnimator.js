@@ -1,6 +1,7 @@
 "use strict";
 var utils_1 = require('./utils');
 var errors_1 = require('./errors');
+var literals_1 = require('./literals');
 // fixme!: this controls the amount of time left before the timeline gives up 
 // on individual animation and calls finish.  If an animation plays after its time, it looks
 // like it restarts and that causes jank
@@ -20,14 +21,14 @@ var TimelineAnimator = (function () {
      * @param {ja.ITimelineOptions} options (description)
      */
     function TimelineAnimator(manager, options) {
-        var duration = options.duration;
-        if (!utils_1.isDefined(duration)) {
-            errors_1.argumentError('duration');
+        var durationMs = options.duration;
+        if (!utils_1.isDefined(durationMs)) {
+            errors_1.argumentError(literals_1.duration);
         }
         this.playbackRate = 0;
         this.duration = options.duration;
         this.currentTime = 0;
-        this._events = utils_1.map(options.events, function (evt) { return new TimelineEvent(manager, duration, evt); });
+        this._events = utils_1.map(options.events, function (evt) { return new TimelineEvent(manager, durationMs, evt); });
         this._isPaused = false;
         this._manager = manager;
         // ensure context of tick is this instance        

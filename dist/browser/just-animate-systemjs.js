@@ -284,7 +284,7 @@ System.register("just-animate/core/errors", [], function(exports_2, context_2) {
 System.register("just-animate/core/literals", [], function(exports_3, context_3) {
     "use strict";
     var __moduleName = context_3 && context_3.id;
-    var hyphenToPascal, x, y, z, cubicBezier, offset, scale3d, scale, scaleX, scaleY, scaleZ, skew, skewX, skewY, rotate3d, rotate, rotateX, rotateY, rotateZ, translate3d, translate, translateX, translateY, translateZ, transform;
+    var hyphenToPascal, x, y, z, cubicBezier, duration, offset, scale3d, scale, scaleX, scaleY, scaleZ, skew, skewX, skewY, rotate3d, rotate, rotateX, rotateY, rotateZ, translate3d, translate, translateX, translateY, translateZ, transform;
     return {
         setters:[],
         execute: function() {
@@ -293,6 +293,7 @@ System.register("just-animate/core/literals", [], function(exports_3, context_3)
             exports_3("y", y = 1);
             exports_3("z", z = 2);
             exports_3("cubicBezier", cubicBezier = 'cubic-bezier');
+            exports_3("duration", duration = 'duration');
             exports_3("offset", offset = 'offset');
             exports_3("scale3d", scale3d = 'scale3d');
             exports_3("scale", scale = 'scale');
@@ -1109,10 +1110,10 @@ System.register("just-animate/core/SequenceAnimator", ["just-animate/core/utils"
         }
     }
 });
-System.register("just-animate/core/TimelineAnimator", ["just-animate/core/utils", "just-animate/core/errors"], function(exports_9, context_9) {
+System.register("just-animate/core/TimelineAnimator", ["just-animate/core/utils", "just-animate/core/errors", "just-animate/core/literals"], function(exports_9, context_9) {
     "use strict";
     var __moduleName = context_9 && context_9.id;
-    var utils_5, errors_2;
+    var utils_5, errors_2, literals_3;
     var animationPadding, TimelineAnimator, TimelineEvent;
     return {
         setters:[
@@ -1121,6 +1122,9 @@ System.register("just-animate/core/TimelineAnimator", ["just-animate/core/utils"
             },
             function (errors_2_1) {
                 errors_2 = errors_2_1;
+            },
+            function (literals_3_1) {
+                literals_3 = literals_3_1;
             }],
         execute: function() {
             // fixme!: this controls the amount of time left before the timeline gives up 
@@ -1142,14 +1146,14 @@ System.register("just-animate/core/TimelineAnimator", ["just-animate/core/utils"
                  * @param {ja.ITimelineOptions} options (description)
                  */
                 function TimelineAnimator(manager, options) {
-                    var duration = options.duration;
-                    if (!utils_5.isDefined(duration)) {
-                        errors_2.argumentError('duration');
+                    var durationMs = options.duration;
+                    if (!utils_5.isDefined(durationMs)) {
+                        errors_2.argumentError(literals_3.duration);
                     }
                     this.playbackRate = 0;
                     this.duration = options.duration;
                     this.currentTime = 0;
-                    this._events = utils_5.map(options.events, function (evt) { return new TimelineEvent(manager, duration, evt); });
+                    this._events = utils_5.map(options.events, function (evt) { return new TimelineEvent(manager, durationMs, evt); });
                     this._isPaused = false;
                     this._manager = manager;
                     // ensure context of tick is this instance        
@@ -1479,50 +1483,50 @@ System.register("just-animate/animations/bounce", [], function(exports_11, conte
         setters:[],
         execute: function() {
             exports_11("bounce", bounce = {
+                name: 'bounce',
                 keyframes: [
                     {
                         offset: 0,
-                        translate3d: '0'
+                        translate3d: 0
                     },
                     {
                         offset: 0.2,
-                        translate3d: ['0', '0', '0']
+                        translate3d: 0
                     },
                     {
                         offset: 0.4,
-                        translate3d: ['0', '-30px', '0']
+                        translateY: '-30px'
                     },
                     {
                         offset: 0.43,
-                        translate3d: ['0', '-30px', '0']
+                        translateY: '-30px'
                     },
                     {
                         offset: 0.53,
-                        translate3d: ['0', '0', '0']
+                        translate3d: 0
                     },
                     {
                         offset: 0.7,
-                        translate3d: ['0', '-15px', '0']
+                        translateY: '-15px'
                     },
                     {
                         offset: 0.8,
-                        translate3d: ['0', '0', '0']
+                        translate3d: 0
                     },
                     {
                         offset: 0.9,
-                        translate3d: ['0', '-4px', '0']
+                        translateY: '-4px'
                     },
                     {
                         offset: 1,
-                        translate3d: ['0', '0', '0']
+                        translate3d: 0
                     }
                 ],
                 timings: {
                     duration: 900,
-                    fill: 'both',
-                    easing: 'easeOutCubic'
-                },
-                name: 'bounce'
+                    easing: 'easeOutCubic',
+                    fill: 'both'
+                }
             });
         }
     }
